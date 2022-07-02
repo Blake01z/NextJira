@@ -53,6 +53,15 @@ export const EntriesProvider:FC = ({children}) => {
         }
     }
 
+    const deleteEntry = async (_id: any) => {
+        try {
+            await entriesApi.delete(`/entries/${_id}`)
+            dispatch({type: '[Entry] Entry-delete', payload:_id})
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const refreshEntries = async () => {
         const {data} = await entriesApi.get<Entry[]>('/entries');
         dispatch({type:'[Entry] Refresh-Data', payload:data});
@@ -69,7 +78,8 @@ export const EntriesProvider:FC = ({children}) => {
                     
                     //Methods
                     addNewEntry,
-                    updateEntry
+                    updateEntry,
+                    deleteEntry
                 }}
                  >
                   {children}

@@ -24,6 +24,7 @@ import { Layout } from '../../components/layouts';
 import { Entry ,EntryStatus } from '../../interfaces/entry';
 import { EntriesContext } from '../../context/entries/EntriesContext';
 import { dateFunctions } from '../../utils';
+import { useRouter } from 'next/router';
 
 
 const validStatus: EntryStatus[] = ['pending','in-progress','finished'];
@@ -36,7 +37,8 @@ interface Props{
 
 const EntryPage:FC<Props> = ({entry}) => {
 
-    const {updateEntry} = useContext(EntriesContext);
+    const {updateEntry,deleteEntry} = useContext(EntriesContext);
+    const router = useRouter();
 
     const [inputValue, setInputValue] = useState(entry.description);
     const [status, setStatus] = useState<EntryStatus>(entry.status);
@@ -62,6 +64,11 @@ const EntryPage:FC<Props> = ({entry}) => {
         }
 
         updateEntry(updatedEntry, true);
+    }
+
+    const entryDelete = () => {
+        deleteEntry(entry._id)
+        router.push('/');
     }
 
   return (
@@ -132,7 +139,9 @@ const EntryPage:FC<Props> = ({entry}) => {
             bottom:30,
             right:30,
             backgroundColor:'error.dark'
-        }}>
+        }}
+        onClick={entryDelete}
+        >
             <DeleteOutlineOutlinedIcon/>
         </IconButton>
     </Layout>
