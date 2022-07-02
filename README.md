@@ -14,6 +14,12 @@ mongodb://localhost:27017/entriesdb
 ## Configurar las variables de entorno
 Renombrar el archvio __.env.template__ a  __.env__ 
 
+* Reconstruir los modulos de node
+```
+npm install
+npm run dev
+```
+
 ## LLenar la base de datos con informacion de pruebas
 Llamar:
 ```
