@@ -16,7 +16,7 @@ const Entries_INITIAL_STATE: EntriesState = {
 }
 
 interface Props{
-    children:any
+    children?:any
 }
 
 export const EntriesProvider:FC<Props> = ({children}:any) => {
