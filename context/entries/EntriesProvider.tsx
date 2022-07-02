@@ -15,7 +15,7 @@ const Entries_INITIAL_STATE: EntriesState = {
     entries: []
 }
 
-interface Props{
+type Props = {
     children?:any
 }
 
