@@ -1,4 +1,6 @@
-import { useState, ChangeEvent, useMemo } from 'react';
+import { useState, ChangeEvent, useMemo, FC, useContext } from 'react';
+import { GetServerSideProps } from 'next'
+
 import { Grid, 
     Card, 
     CardHeader, 
@@ -16,15 +18,28 @@ import { Grid,
 } from '@mui/material';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+
+import {dbEntries} from '../../database/';
 import { Layout } from '../../components/layouts';
-import { EntryStatus } from '../../interfaces/entry';
+import { Entry ,EntryStatus } from '../../interfaces/entry';
+import { EntriesContext } from '../../context/entries/EntriesContext';
+import { dateFunctions } from '../../utils';
+
 
 const validStatus: EntryStatus[] = ['pending','in-progress','finished'];
 
-const EntryPage = () => {
 
-    const [inputValue, setInputValue] = useState('');
-    const [status, setStatus] = useState<EntryStatus>('pending');
+interface Props{
+    entry: Entry
+}
+
+
+const EntryPage:FC<Props> = ({entry}) => {
+
+    const {updateEntry} = useContext(EntriesContext);
+
+    const [inputValue, setInputValue] = useState(entry.description);
+    const [status, setStatus] = useState<EntryStatus>(entry.status);
     const [touched, setTouched] = useState(false);
 
     const isNotValid = useMemo(() => inputValue.length <= 0 && touched, [inputValue,touched]);
@@ -34,16 +49,23 @@ const EntryPage = () => {
     }
 
     const onStatusChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value)
         setStatus(e.target.value as EntryStatus)
     }
 
     const onSave = () => {
+        if(inputValue.trim().length === 0) return;
 
+        const updatedEntry:Entry = {
+           ...entry,
+           status,
+           description: inputValue 
+        }
+
+        updateEntry(updatedEntry, true);
     }
 
   return (
-    <Layout title="... ... ...">
+    <Layout title={inputValue.substring(0,20 ) + '...'}>
         <Grid
             container
             justifyContent='center'
@@ -51,8 +73,8 @@ const EntryPage = () => {
         >   
             <Grid item xs={12} sm={8} md={6}>
                 <Card>
-                    <CardHeader title={`Entrada: ${inputValue}`}
-                                subheader={`Creada hace: .... 18m ago`}
+                    <CardHeader title={`Entrada`}
+                                subheader={`Creada ${dateFunctions.getFormatDistanceToNow(entry.createdAt)}`}
                     />
                     <CardContent>
                         <TextField 
@@ -115,6 +137,31 @@ const EntryPage = () => {
         </IconButton>
     </Layout>
   )
+};
+
+
+// You should use getServerSideProps when:
+// - Only if you need to pre-render a page whose data must be fetched at request time
+export const getServerSideProps: GetServerSideProps = async ({params}) => {
+
+    const {id} = params as {id: string};
+
+    const entry = await dbEntries.getEntryById(id);
+
+    if(!entry){
+        return {
+            redirect:{
+                destination: '/',
+                permanent: false
+            }
+        } 
+    }
+
+    return {
+        props: {
+            entry
+        }
+    }
 }
 
 export default EntryPage
