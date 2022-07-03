@@ -1,4 +1,4 @@
-# Next.js OpenJira
+# Next.js OpenJira configuraciones para el proyeto...
 Para correr localmente, se necesita la base de datos
 ```
 docker-compose up -d
